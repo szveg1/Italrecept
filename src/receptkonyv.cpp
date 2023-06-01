@@ -15,7 +15,8 @@ void Receptkonyv::ujRecept(std::istream& is, std::ostream& os) {
     size_t valasz;
     double mennyi;
 //  bekérjük a recept nevét
-    bemenetKezel(is, os, "\nMi legyen a recept neve?\n", nev);
+    try{bemenetKezel(is, os, "\nMi legyen a recept neve?\n", nev);}
+    catch(const char *e){std::cerr << e;}
 // megnézzük, hogy van-e már ilyen nevű recept
 // ha igen akkor nem engedjük a felhasználónak,
 // hogy létrehozzon egy duplikátumot
@@ -43,16 +44,16 @@ void Receptkonyv::ujRecept(std::istream& is, std::ostream& os) {
         os << '[' << alapanyagok.size() + 2 << "] Megse" << std::endl;
         os << "A recept eddig: " << std::endl;
         r->kiir(os);
-        bemenetKezel(is, os, "Valasszon alapanyagot : ", valasz);
-        if(valasz < alapanyagok.size()){
-            bemenetKezel(is, os, "Mennyit?\n", mennyi);
-            try{r->hozzaad(alapanyagok[valasz]->clone(), mennyi);}
-            catch (const char* e){std::cerr << e;}
-        }else if(valasz == alapanyagok.size()){
-            ujAlapanyag();
-        }else if(valasz == alapanyagok.size() + 1 || valasz == alapanyagok.size() + 2){
-            break;
-        }else{}
+        try{bemenetKezel(is, os, "Valasszon alapanyagot : ", valasz);
+            if(valasz < alapanyagok.size()){
+                bemenetKezel(is, os, "Mennyit?\n", mennyi);
+                r->hozzaad(alapanyagok[valasz]->clone(), mennyi);
+            }else if(valasz == alapanyagok.size()){
+                ujAlapanyag();
+            }else if(valasz == alapanyagok.size() + 1 || valasz == alapanyagok.size() + 2){
+                break;
+            }else{}
+        }catch (const char* e){std::cerr << e;}
     }while(true);
     if(valasz == alapanyagok.size() + 2){
         delete r;
@@ -84,6 +85,7 @@ void Receptkonyv::ujAlapanyag(std::istream& is, std::ostream& os){
     if(letezik)
         return;
 //  egyébként bekérjük az alapanyag adatait
+
     bemenetKezel(is, os, "Mi legyen az alapanyag mertekegysege?\n", mertekegyseg);
     bemenetKezel(is, os, "Mi legyen az alapanyag tipusa?\n[A] - Alkoholos\n[M] - Alkoholmentes\n[D] - Diszites\n", tipus);
     if(tipus == "A"){
@@ -200,7 +202,8 @@ void Receptkonyv::receptTorol(std::istream& is, std::ostream& os){
     os << "[" << receptek.size() + 1 << "] Megse\n" << std::endl;
     size_t idx;
 //  bekérjük a felhasználó választását
-    bemenetKezel(is, os, "Melyik recept keruljon torlesre?\n", idx);
+    try{bemenetKezel(is, os, "Melyik recept keruljon torlesre?\n", idx);}
+    catch(const char* e){std::cerr << e;}
     if(idx <= receptek.size()){
         receptek.torol(idx - 1);
     }else if(idx == receptek.size() + 1){
@@ -232,7 +235,8 @@ void Receptkonyv::receptekKiir(std::istream& is,std::ostream& os) const {
     }
     os << "[" << receptek.size() + 1 << "] Vissza\n" << std::endl;
     size_t valasz;
-    bemenetKezel(is, os, "Valasszon receptet: ", valasz);
+    try{bemenetKezel(is, os, "Valasszon receptet: ", valasz);}
+    catch(const char* e){std::cerr << e;}
     if(valasz <= receptek.size()){
         receptek[valasz - 1]->kiir(os);
     }else if(valasz == receptek.size() + 1){
